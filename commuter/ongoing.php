@@ -1,3 +1,6 @@
+<?php
+include('../php/session_commuter.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +32,7 @@
     include('../db/tdbconn.php');
         $commuterID = 1;
 
-        $sql = "SELECT pickupPoint, dropoffPoint, fare, distance FROM booking WHERE commuterID = ? ORDER BY bookingDate DESC LIMIT 1";
+        $sql = "SELECT pickupPoint, dropoffPoint, fare, distance FROM booking WHERE commuterID = ? AND status = 'accepted' ORDER BY bookingDate DESC LIMIT 1";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $commuterID);
         $stmt->execute();

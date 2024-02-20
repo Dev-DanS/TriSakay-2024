@@ -1,3 +1,6 @@
+<?php
+include('../php/session_commuter.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 

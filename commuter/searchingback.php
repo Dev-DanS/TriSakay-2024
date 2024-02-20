@@ -8,7 +8,7 @@ if ($conn === false) {
     die("Database connection failed.");
 }
 
-$query = "SELECT plateNumber FROM booking WHERE commuterid = ? ORDER BY bookingDate DESC LIMIT 1";
+$query = "SELECT plateNumber FROM booking WHERE commuterid = ? AND status = 'pending' ORDER BY bookingDate DESC LIMIT 1";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $commuterid);
 $stmt->execute();
@@ -19,8 +19,9 @@ if ($stmt->fetch()) {
         echo "notnull";
     }
 } else {
-    echo "No booking found for the user.";
+    echo "No pending booking found for the user.";
 }
+
 
 $stmt->close();
 $conn->close();

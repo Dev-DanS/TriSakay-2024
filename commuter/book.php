@@ -1,3 +1,30 @@
+<?php
+include('../php/session_commuter.php');
+?>
+<?php
+include '../db/tdbconn.php';
+
+$todaQuery = "SELECT Toda, Coordinates FROM todaterminal";
+$todaResult = mysqli_query($conn, $todaQuery);
+
+$todaLocations = [];
+
+while ($tl = mysqli_fetch_assoc($todaResult)) {
+    $todaLocations[] = ['Toda' => $tl['Toda'], 'Coordinates' => json_decode($tl['Coordinates'], true)];
+}
+
+$todalocationData = json_encode($todaLocations);
+
+$borderQuery = "SELECT border FROM province LIMIT 1";
+$borderResult = mysqli_query($conn, $borderQuery);
+
+if ($borderResult) {
+    $border = mysqli_fetch_assoc($borderResult)['border'];
+} else {
+    echo "Error fetching border data: " . mysqli_error($conn);
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,13 +34,9 @@
     <title>Commuter | Book</title>
     <link rel="icon" href="../img/logo3.png" type="image/png" />
     <link rel="stylesheet" href="../css/cbook.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
-        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/965a209c77.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -35,8 +58,7 @@
 
     <div class="dropdown-center">
         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-users" style="color: #ffffff;"></i> Passenger(s): <span
-                id="passenger-display">1</span>
+            <i class="fa-solid fa-users" style="color: #ffffff;"></i> Passenger(s): <span id="passenger-display">1</span>
         </button>
         <ul class="dropdown-menu" id="passenger-dropdown">
             <li><a class="dropdown-item" href="#" data-value="1">1</a></li>
@@ -47,35 +69,12 @@
     </div>
 
     <div class="confirm">
-        <button class="confirm-btn" id="confirm-btns">
+        <button type="submit" class="confirm-btn" id="generateData">
             <i class="fa-solid fa-check fa-lg" style="color: #ffffff;"></i> Confirm Booking
         </button>
     </div>
 
-    <?php
-    include '../db/tdbconn.php';
 
-    $todaQuery = "SELECT Toda, Coordinates FROM todaterminal";
-    $todaResult = mysqli_query($conn, $todaQuery);
-
-    $todaLocations = [];
-
-    while ($tl = mysqli_fetch_assoc($todaResult)) {
-        $todaLocations[] = ['Toda' => $tl['Toda'], 'Coordinates' => json_decode($tl['Coordinates'], true)];
-    }
-
-    $todalocationData = json_encode($todaLocations);
-
-    $borderQuery = "SELECT border FROM province LIMIT 1";
-    $borderResult = mysqli_query($conn, $borderQuery);
-
-    if ($borderResult) {
-        $border = mysqli_fetch_assoc($borderResult)['border'];
-    } else {
-        echo "Error fetching border data: " . mysqli_error($conn);
-        exit();
-    }
-    ?>
 
 
     <script src="search.js"></script>
@@ -102,7 +101,9 @@
 
 
         var pickupPoint;
+        var pickupPoints;
         var dropoffPoint;
+        var dropoffPoints;
         var noPassenger;
 
         let passengerCount = 1;
@@ -122,23 +123,31 @@
             }
         });
 
-        let userMarker; 
+        let userMarker;
 
         if ('geolocation' in navigator) {
             const watchId = navigator.geolocation.watchPosition(
-                ({ coords: { latitude: userLat, longitude: userLng } }) => {
+                ({
+                    coords: {
+                        latitude: userLat,
+                        longitude: userLng
+                    }
+                }) => {
                     pickupPoint = [userLat, userLng];
+                    pickupPoints = `${userLat},${userLng}`;
 
                     // Remove the existing user marker if it exists
                     if (userMarker) map.removeLayer(userMarker);
 
-                    userMarker = L.marker([userLat, userLng], { icon: greenMarkerIcon }).addTo(map);
+                    userMarker = L.marker([userLat, userLng], {
+                        icon: greenMarkerIcon
+                    }).addTo(map);
                     userMarker.bindPopup('You are here').openPopup();
 
-                    checkInsidePolygon(userLat, userLng); 
+                    checkInsidePolygon(userLat, userLng);
                     findNearestTODA(userLat, userLng);
 
-                    // console.log(`Pickup Point: ${pickupPoint}`);
+                    console.log(`Pickup Point: ${pickupPoint}`);
                 },
                 (error) => {
                     console.error(`Error getting User's location: ${error.message}`);
@@ -160,7 +169,10 @@
         }
 
         function isPointInsidePolygon(point, polygon) {
-            const { lat, lng } = point;
+            const {
+                lat,
+                lng
+            } = point;
             const polygonVertices = polygon.getLatLngs()[0];
 
             let intersectCount = 0;
@@ -201,13 +213,19 @@
 
 
             todalocations.forEach((location) => {
-                const { lat, lng } = location.Coordinates.latlng;
+                const {
+                    lat,
+                    lng
+                } = location.Coordinates.latlng;
                 const distance = L.latLng(userLat, userLng).distanceTo([lat, lng]);
 
                 if (distance < minDistance) {
                     nearestTODA = location.Toda;
                     minDistance = distance;
-                    nearestLatLng = { lat, lng };
+                    nearestLatLng = {
+                        lat,
+                        lng
+                    };
                 }
             });
 
@@ -219,6 +237,7 @@
 
         let distanceToda;
         let distanceToNearestTODA;
+
         function calculateDistanceAndDisplayPopup() {
             const url = `https://router.project-osrm.org/route/v1/driving/${pickupPoint[1]},${pickupPoint[0]};${nearestLatLng.lng},${nearestLatLng.lat}?overview=full&geometries=geojson`;
 
@@ -242,7 +261,7 @@
             url: 'farematrix.php',
             method: 'GET',
             dataType: 'json',
-            success: function (response) {
+            success: function(response) {
                 if (response.error) {
                     console.error(response.error);
                 } else {
@@ -257,7 +276,7 @@
                     console.log('Fare Per Passenger:', farePerPassenger);
                 }
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 console.error("Farematrix request failed:", error);
             }
         });
@@ -270,11 +289,18 @@
         let fare;
         let durationMinutes;
 
-        map.on('dblclick', function (e) {
-            const { lat, lng } = e.latlng;
-            const dropoffPoint = L.latLng(lat, lng);
+        map.on('dblclick', function(e) {
+            const {
+                lat,
+                lng
+            } = e.latlng;
+            dropoffPoint = L.latLng(lat, lng);
+            dropoffPoints = `${lat},${lng}`;
 
-            const isInsideBorder = isPointInsidePolygon({ lat, lng }, L.polygon(<?php echo json_encode(json_decode($border, true)); ?>.latlngs));
+            const isInsideBorder = isPointInsidePolygon({
+                lat,
+                lng
+            }, L.polygon(<?php echo json_encode(json_decode($border, true)); ?>.latlngs));
 
             if (isInsideBorder) {
                 if (dropoffMarker) map.removeLayer(dropoffMarker);
@@ -310,12 +336,15 @@
                         const boundsWithPadding = routeLayer.getBounds().pad(0.1); // 10% padding
                         map.fitBounds(boundsWithPadding);
 
-                        dropoffMarker = L.marker([lat, lng], { icon: redMarkerIcon }).addTo(map);
+                        dropoffMarker = L.marker([lat, lng], {
+                            icon: redMarkerIcon
+                        }).addTo(map);
                         dropoffMarker.bindPopup(`Drop-off<br>Distance: ${distance} km<br>ETA: ${durationMinutes} minutes`).openPopup();
 
                         console.log('Distance:', distance);
-                        document.getElementById("confirm-btns").style.display = "block";
+                        document.getElementById("generateData").style.display = "block";
                         calculateFare(distance)
+                        console.log('Dropoff Point', dropoffPoints);
 
                         // console.log(`Drop-off: ${dropoffPoint}, Distance: ${distance} km, ETA: ${durationMinutes} minutes`);
                     })
@@ -343,14 +372,40 @@
                 fare = Math.round(baseFare + (distance - 2) * perKM);
                 fare += (passengerCount > 1 ? (passengerCount - 1) * farePerPassenger : 0);
             }
+            grandTotal = fare
+            // console.log(fare);
+            console.log('Grandtotal', grandTotal);
 
-            console.log(fare);
             dropoffMarker.bindPopup(`<b><div style="text-align: center; ">Drop-off</div></b>Distance: ${distance} km<br>ETA: ${durationMinutes} minutes<br>Fare: <b>₱${fare}</b>`).openPopup();
 
         }
 
+        $(document).ready(function() {
+            $("#generateData").click(function() {
+                const dataToSend = {
+                    nearestTODA: nearestTODA,
+                    pickupPoints: pickupPoints,
+                    dropoffPoints: dropoffPoints,
+                    grandTotal: grandTotal,
+                    passengerCount: passengerCount,
+                    durationMinutes: durationMinutes,
+                    distance: distance
+                };
 
-
+                $.ajax({
+                    type: "POST",
+                    url: "booking_back.php",
+                    data: dataToSend,
+                    success: function(response) {
+                        console.log("Data sent successfully to booking_back.php");
+                        window.location.href = 'searching.php';
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error sending data:", error);
+                    }
+                });
+            });
+        });
     </script>
 </body>
 

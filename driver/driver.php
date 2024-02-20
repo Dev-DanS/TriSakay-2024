@@ -1,3 +1,6 @@
+<?php
+include('../php/session_driver.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
