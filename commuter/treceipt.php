@@ -23,7 +23,7 @@
     ?>
 
     <?php
-    include 'receiptback.php';
+    include 'treceiptback.php';
     ?>
 
     <div class="container" id="receiptContainer">
@@ -34,24 +34,24 @@
             </div>
 
             <div class="dateContainer">
-                <p class="date">11 March 2024, 5:54 PM</p>
+                <p class="date"><?php echo $formattedDate; ?></p>
             </div>
 
             <hr>
 
             <div class="fareInfo">
                 <p class="fareLabel">Fare</p>
-                <p class="fare">₱ 150</p>
+                <p class="fare">₱ <?php echo $fare; ?></p>
             </div>
 
             <hr>
 
             <div class="locInfo">
-                <p class="pickUp"><i class="fa-solid fa-location-dot fa-xl" style="color: #03b14e;"></i> Baliuag
-                    University, Baliuag</p>
+                <p class="pickUp"><i class="fa-solid fa-location-dot fa-xl" style="color: #03b14e;"></i>
+                    <?php echo $pickupAddress; ?></p>
                 <div class="line"></div>
-                <p class="dropOff"><i class="fa-solid fa-location-dot fa-xl" style="color: #ff0000;"></i> SM Baliuag,
-                    Baliuag</p>
+                <p class="dropOff"><i class="fa-solid fa-location-dot fa-xl" style="color: #ff0000;"></i>
+                    <?php echo $dropoffAddress; ?></p>
             </div>
 
             <div class="driverInfo">
@@ -62,12 +62,13 @@
 
                 <p class="rate">Please rate my service</p>
                 <p class="star">
-                    <i class="fa-regular fa-star fa-lg" style="color: #03b14e;"></i>
-                    <i class="fa-regular fa-star fa-lg" style="color: #03b14e;"></i>
-                    <i class="fa-regular fa-star fa-lg" style="color: #03b14e;"></i>
-                    <i class="fa-regular fa-star fa-lg" style="color: #03b14e;"></i>
-                    <i class="fa-regular fa-star fa-lg" style="color: #03b14e;"></i>
+                    <i class="fa-regular fa-star fa-lg" data-value="1" style="color: #03b14e;"></i>
+                    <i class="fa-regular fa-star fa-lg" data-value="2" style="color: #03b14e;"></i>
+                    <i class="fa-regular fa-star fa-lg" data-value="3" style="color: #03b14e;"></i>
+                    <i class="fa-regular fa-star fa-lg" data-value="4" style="color: #03b14e;"></i>
+                    <i class="fa-regular fa-star fa-lg" data-value="5" style="color: #03b14e;"></i>
                 </p>
+
             </div>
 
             <div class="download">
@@ -93,6 +94,26 @@
                     document.getElementById('downloadBtn').style.display = 'block';
                     document.getElementById('receiptContainer').style.width = 'auto';
                 });
+        });
+
+        let rated = false;
+
+        document.querySelectorAll('.star i').forEach((star) => {
+            star.addEventListener('click', () => {
+                if (!rated) {
+                    const value = parseInt(star.getAttribute('data-value'));
+                    const confirmed = confirm('Are you sure you want to rate ' + value + ' stars?');
+                    if (confirmed) {
+                        rated = true;
+                        document.querySelectorAll('.star i').forEach((s) => {
+                            const sValue = parseInt(s.getAttribute('data-value'));
+                            s.classList.toggle('fa-solid', sValue <= value);
+                        });
+                    }
+                } else {
+                    alert('You have already rated.');
+                }
+            });
         });
     </script>
 

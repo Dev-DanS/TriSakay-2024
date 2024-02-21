@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commuter | Driver Found</title>
+    <link rel="icon" href="../img/logo3.png" type="image/png" />
+    <link rel="stylesheet" href="../css/tcfound.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
+        rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/965a209c77.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="commuter.php">
+                <img src="../img/Logo2.png" alt="Bootstrap" height="50" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                style="background-color: #e3f2fd">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse text-center" id="navbarNav">
+                <ul class="navbar-nav nav-underline ms-auto me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="commuter.php">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Dan
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Manage Account</a></li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li><a class="dropdown-item" href="../php/logout.php" style="color: red;">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="map" style="width: 100%; height: 65vh;"></div>
+
+    <div class="rideData">
+        <div class="rideText">
+            <p class="otw">Driver is on the way</p>
+            <p class="time">4 mins</p>
+        </div>
+    </div>
+    <div class="rideInfo">
+        <div class="driverInfo">
+            <img src="../img/jaja.jpg" alt="" style="width:50px; height: 50px; border-radius: 50%;">
+
+            <div class="infoText">
+                <p class="driverName">Jhaziel M. Saguid • 4.5 <i class="fa-solid fa-star fa-sm" data-value="1"
+                        style="color: #FFFF00;"></i></p>
+                <p class="plateNumber">XYZ 5678</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="cancel">
+        <button type="submit" class="cancel-btn" id="generateData">
+             Cancel Booking
+        </button>
+    </div>
+
+    <script>
+        var map = L.map('map', {
+            zoomControl: false,
+            doubleClickZoom: false
+        }).setView([14.954264838385502, 120.90079147651407], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    </script>
+</body>
+
+</html>
