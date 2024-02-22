@@ -58,16 +58,32 @@
 
     <div id="map" style="width: 100%; height: 65vh;"></div>
 
-    <div class="rideInfo">
+    <div class="rideData">
         <div class="rideText">
-            <p class="pickUp"><i class="fa-solid fa-location-dot fa-sm" style="color: #03b14e;"></i>
-                Baliuag University, Baliuag</p>
-            <div class="line"></div>
-            <p class="dropOff"><i class="fa-solid fa-location-dot fa-sm" style="color: #ff0000;"></i>
-                SM Baliuag, Baliuag</p>
+            <p class="otw"><i class="fa-solid fa-location-dot fa-xl" style="color: #ff0000;"></i> SM Baliuag, Baliuag •<strong> 4 mins</strong> 
+            </p>
+            <p class="time">₱ 150.00</p>
         </div>
     </div>
-    
+
+    <div class="rideInfo">
+        <div class="driverInfo">
+            <img src="../img/male.png" alt="" style="width:50px; height: 50px; border-radius: 50%;">
+
+            <div class="infoText">
+                <p class="driverName">Juanito Santos • 4.3 <i class="fa-solid fa-star fa-sm"
+                        style="color: #FFFF00;"></i></p>
+                <p class="plateNumber">XYZ 5678</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="endTrip">
+        <button type="submit" class="endTrip-btn" id="endTrip">
+            End Trip Early
+        </button>
+    </div>
+
     <script>
         var map = L.map('map', {
             zoomControl: false,
@@ -77,6 +93,57 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        document.getElementById('endTrip').addEventListener('click', function () {
+            var confirmEnd = confirm('Ending your trip early will charge you for the distance traveled so far. Cancellation Fee ₱ 100.00');
+            if (confirmEnd) {
+                this.disabled = true;
+                console.log('Ending the trip early...');
+            }
+        });
+
+        const createMarkerIcon = (color) => L.icon({
+            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        });
+
+        const blueIcon = createMarkerIcon('blue');
+        const greenMarkerIcon = createMarkerIcon('green');
+        const redMarkerIcon = createMarkerIcon('red');
+
+        let pickupPoint;
+        let dropoffPoint;
+
+        let userMarker;
+
+        if ('geolocation' in navigator) {
+            const watchId = navigator.geolocation.watchPosition(
+                ({
+                    coords: {
+                        latitude: userLat,
+                        longitude: userLng
+                    }
+                }) => {
+                    pickupPoint = [userLat, userLng];
+                    if (userMarker) map.removeLayer(userMarker);
+
+                    userMarker = L.marker([userLat, userLng], {
+                        icon: greenMarkerIcon
+                    }).addTo(map);
+                    userMarker.bindPopup('You are here').openPopup();
+
+                    checkInsidePolygon(userLat, userLng);
+                    findNearestTODA(userLat, userLng);
+
+                    console.log(`Pickup Point: ${pickupPoint}`);
+                },
+                (error) => {
+                    console.error(`Error getting User's location: ${error.message}`);
+                }
+            );
+        }
     </script>
 </body>
 
