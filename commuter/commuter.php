@@ -10,63 +10,26 @@ include('../php/session_commuter.php');
     <title>Commuter | Dashboard</title>
     <link rel="icon" href="../img/logo3.png" type="image/png" />
     <link rel="stylesheet" href="../css/cdashboard2.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
-        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/965a209c77.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-<?php
+    <?php
     include 'cnav.php';
     ?>
 
     <div class="panel">
-        <p class="location">
-            <i class="fa-solid fa-location-dot fa-lg" style="color: #ffffff;"></i>
-            Baliuag, Bulacan
-        </p>
-        <!-- <p class="welcome">Welcome Back</p> -->
+        <div class="address">
+            <p class="loc"><i class="fa-solid fa-location-dot fa-lg" style="color: #ffff;"></i> Locating your current
+                address...</p>
+        </div>
+
     </div>
-    
-    <?php
-    // include('../db/tdbconn.php');
-    // $commuterId = $_SESSION["commuterid"];
 
-    // $query = "SELECT firstname FROM commuter WHERE commuterid = ?";
-    // $stmt = mysqli_prepare($conn, $query);
 
-    // if ($stmt) {
-    //     mysqli_stmt_bind_param($stmt, "s", $commuterId);
-    //     mysqli_stmt_execute($stmt);
-
-    //     $result = mysqli_stmt_get_result($stmt);
-
-    //     if ($result) {
-    //         if (mysqli_num_rows($result) > 0) {
-    //             $row = mysqli_fetch_assoc($result);
-    //             $firstname = $row['firstname'];
-
-    //             mysqli_stmt_close($stmt);
-    //         } else {
-    //             echo "<h1>User not found.</h1>";
-    //         }
-    //     } else {
-    //         echo "<h1>Error querying the database.</h1>";
-    //     }
-    // } else {
-    //     echo "<h1>Error preparing the statement.</h1>";
-    // }
-    ?>
-    <h1>
-        <?php 
-        // echo $firstname; 
-        ?>
-    </h1>
 
     <div class="dashboard">
         <p class="categories">Services Categories</p>
@@ -77,7 +40,7 @@ include('../php/session_commuter.php');
             <button class="booking" onclick="window.location.href='book.php';">
                 <img src="../img/logo3.png" alt="tricycle" width="50" height="50">
             </button>
-            <p class="booklabel">Book</p>
+            <p class="booklabel">Book now</p>
         </div>
 
         <div class="scan">
@@ -94,14 +57,14 @@ include('../php/session_commuter.php');
 
     <div class="buttons">
         <div class="book">
-            <button class="booking">
+            <button class="booking" onclick="window.location.href='tmylocation.html';">
                 <i class="fa-solid fa-location-crosshairs fa-2xl" style="color: #03b14e;"></i>
             </button>
             <p class="booklabel">My Location</p>
         </div>
 
         <div class="scan">
-            <button class="scanqr">
+            <button class="scanqr" onclick="window.location.href='thistory.html';">
                 <i class="fa-solid fa-clock-rotate-left fa-2xl" style="color: #03b14e;"></i>
             </button>
             <p class="scanlabel">History</p>
@@ -112,6 +75,56 @@ include('../php/session_commuter.php');
         <p class="foot">© TriSakay 2023 - 2024</p>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function getLocation() {
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    ({
+                        coords: {
+                            latitude: userLat,
+                            longitude: userLng
+                        }
+                    }) => {
+                        console.log(`Latitude: ${userLat}, Longitude: ${userLng}`);
+
+                        $.ajax({
+                            url: 'https://nominatim.openstreetmap.org/reverse',
+                            method: 'GET',
+                            dataType: 'json',
+                            data: {
+                                format: 'json',
+                                lat: userLat,
+                                lon: userLng,
+                                zoom: 18,
+                            },
+                            success: function(data) {
+                                var address = data.display_name;
+                                var addressParts = address.split(',');
+                                var firstThreeParts = addressParts.slice(0, 3);
+                                var shortenedAddress = firstThreeParts.join(',');
+
+                                var iconHTML = '<i class="fa-solid fa-location-dot fa-lg" style="color: #ffff;"></i> ';
+                                $('.address p').html(iconHTML + shortenedAddress);
+
+                            },
+                            error: function(error) {
+                                console.error('Error getting address: ' + error);
+                            }
+                        });
+                    },
+                    (error) => {
+                        console.error(`Error getting User's location: ${error.message}`);
+                    }
+                );
+            }
+        }
+
+        getLocation();
+
+        setInterval(getLocation, 5000);
+    </script>
 </body>
 
 </html>

@@ -57,7 +57,7 @@
             <div class="driverInfo">
                 <p class="thank">Thank you!</p>
                 <?php
-                echo '<img src="../img/jaja.jpg" alt="" style="width:100px; height: 100px;">';
+                echo '<img src="../img/male.png" alt="" style="width:100px; height: 100px;">';
                 ?>
 
                 <p class="rate">Please rate my service</p>

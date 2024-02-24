@@ -36,7 +36,7 @@ body {
 
 .dropdown-center .btn-secondary {
   /* background-color: #fff; */
-  border-color: #3c8c74;
+  border-color: #3c8c74 !important;
   margin-top: 1vh;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
