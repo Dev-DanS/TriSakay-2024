@@ -124,6 +124,8 @@ if ($borderResult) {
         });
 
         let userMarker;
+        let pickupAddress;
+        let dropoffAddress;
 
         if ('geolocation' in navigator) {
             const watchId = navigator.geolocation.watchPosition(
@@ -146,6 +148,34 @@ if ($borderResult) {
 
                     checkInsidePolygon(userLat, userLng);
                     findNearestTODA(userLat, userLng);
+
+                    $.ajax({
+                        url: 'https://nominatim.openstreetmap.org/reverse',
+                        method: 'GET',
+                        dataType: 'json',
+                        data: {
+                            format: 'json',
+                            lat: userLat,
+                            lon: userLng,
+                            zoom: 18,
+                        },
+                        success: function(data) {
+                            var address = data.display_name;
+                            var addressParts = address.split(',');
+                            var firstThreeParts = addressParts.slice(0, 2);
+                            var shortenedAddress = firstThreeParts.join(',');
+
+                            // var iconHTML = '<i class="fa-solid fa-location-dot fa-lg" style="color: #ffff;"></i> ';
+                            // $('.address p').html(iconHTML + shortenedAddress);
+
+
+                            pickupAddress = shortenedAddress;
+                            console.log(pickupAddress);
+                        },
+                        error: function(error) {
+                            console.error('Error getting address: ' + error);
+                        }
+                    });
 
                     console.log(`Pickup Point: ${pickupPoint}`);
                 },
@@ -297,6 +327,34 @@ if ($borderResult) {
             dropoffPoint = L.latLng(lat, lng);
             dropoffPoints = `${lat},${lng}`;
 
+            $.ajax({
+                        url: 'https://nominatim.openstreetmap.org/reverse',
+                        method: 'GET',
+                        dataType: 'json',
+                        data: {
+                            format: 'json',
+                            lat: lat,
+                            lon: lng,
+                            zoom: 18,
+                        },
+                        success: function(data) {
+                            let address = data.display_name;
+                            let addressParts = address.split(',');
+                            let firstThreeParts = addressParts.slice(0, 2);
+                            let shortenedAddress = firstThreeParts.join(',');
+
+                            // var iconHTML = '<i class="fa-solid fa-location-dot fa-lg" style="color: #ffff;"></i> ';
+                            // $('.address p').html(iconHTML + shortenedAddress);
+
+
+                            dropoffAddress = shortenedAddress;
+                            console.log(dropoffAddress);
+                        },
+                        error: function(error) {
+                            console.error('Error getting address: ' + error);
+                        }
+                    });
+
             const isInsideBorder = isPointInsidePolygon({
                 lat,
                 lng
@@ -389,7 +447,9 @@ if ($borderResult) {
                     grandTotal: grandTotal,
                     passengerCount: passengerCount,
                     durationMinutes: durationMinutes,
-                    distance: distance
+                    distance: distance,
+                    pickupAddress: pickupAddress,
+                    dropoffAddress: dropoffAddress
                 };
 
                 $.ajax({

@@ -10,6 +10,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $passengerCount = $_POST['passengerCount'];
     $durationMinutes = $_POST['durationMinutes'];
     $distance = $_POST['distance'];
+    $pickupAddress = $_POST['pickupAddress'];
+    $dropoffAddress = $_POST['dropoffAddress'];
 
     session_start();
     $commuterid = 1;
@@ -17,11 +19,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     date_default_timezone_set('Asia/Manila');
     $manilaDateTime = date('Y-m-d H:i:s');
 
-    $sql = "INSERT INTO booking (toda, pickuppoint, dropoffpoint, status, fare, passengerCount, eta, bookingDate, commuterID, distance) 
-            VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO booking (toda, pickuppoint, dropoffpoint, status, fare, passengerCount, eta, bookingDate, commuterID, distance, pickupAddress, dropoffAddress) 
+            VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, "ssssssssd", $nearestTODA, $pickupPoints, $dropoffPoints, $grandTotal, $passengerCount, $durationMinutes, $manilaDateTime, $commuterid, $distance);
+        mysqli_stmt_bind_param($stmt, "ssssssssdss", $nearestTODA, $pickupPoints, $dropoffPoints, $grandTotal, $passengerCount, $durationMinutes, $manilaDateTime, $commuterid, $distance, $pickupAddress, $dropoffAddress);
 
         if (mysqli_stmt_execute($stmt)) {
             echo "success";

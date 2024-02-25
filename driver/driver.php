@@ -22,6 +22,7 @@ include('../php/session_driver.php');
     <?php
     include 'dnav.php';
     ?>
+    <?php include 'dplatenumber.php'; ?>
     <div class="panel">
         <p class="location">
             <i class="fa-solid fa-location-dot fa-lg" style="color: #ffffff;"></i>
@@ -29,6 +30,7 @@ include('../php/session_driver.php');
         </p>
         <!-- <p class="welcome">Welcome Back</p> -->
     </div>
+
 
     <p class="reminder">Are you well-rested and ready for your next ride? Remember, safe driving starts with you!</p>
 

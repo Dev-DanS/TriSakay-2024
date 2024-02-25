@@ -8,6 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Hash the input password using SHA-512
     $hashed_password = hash("sha512", $input_password);
 
+    // Check the commuter table
     $stmt = $conn->prepare("SELECT commuterid, password, status FROM commuter WHERE email = ?");
     $stmt->bind_param("s", $input_email);
     $stmt->execute();
@@ -61,8 +62,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $stmt->close();
 
-            header("Location: index.php?error=true");
-            exit();
+            // If not found in dispatcher table, check driver table
+            $stmt = $conn->prepare("SELECT driverid, password, status FROM driver WHERE email = ?");
+            $stmt->bind_param("s", $input_email);
+            $stmt->execute();
+            $stmt->store_result();
+
+            $stmt->bind_result($driverid, $password, $status);
+            $stmt->fetch();
+
+            if ($stmt->num_rows == 1 && $hashed_password == $password) {
+                if ($status !== null) {
+                    // Account is banned
+                    header("Location: index.php?error=banned");
+                    exit();
+                }
+
+                session_id($driverid);
+                session_start();
+
+                $_SESSION["driverid"] = $driverid;
+                $_SESSION["role"] = "driver"; // Set role session for driver
+
+                header("Location: driver/driver.php");
+                exit();
+            } else {
+                $stmt->close();
+
+                header("Location: index.php?error=true");
+                exit();
+            }
         }
     }
 }

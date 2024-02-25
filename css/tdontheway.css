@@ -1,3 +1,8 @@
+#map {
+  width: 100%;
+  height: 60vh;
+}
+
 body {
   background-color: #03b14e !important;
 }
@@ -24,29 +29,6 @@ body {
   background-color: #800000;
 }
 
-.start {
-  display: flex;
-  justify-content: center;
-}
-
-.start-btn {
-  margin-top: 3vh;
-  background-color: green;
-  width: 85vw;
-  height: 40px;
-  border-radius: 30px;
-  outline: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: none;
-  color: white;
-  transition: background-color 0.3s ease-in-out;
-  display: none;
-}
-
-.start-btn:hover {
-  background-color: darkgreen;
-}
-
 .rideInfo {
   background-color: white;
   border-radius: 0 0 20px 20px;
@@ -58,9 +40,12 @@ body {
 }
 
 .infoText {
-  margin-left: 10px; /* Adjust as needed */
-  display: flex; /* Added */
-  justify-content: space-between; /* Added */
+  margin-left: 10px;
+  /* Adjust as needed */
+  display: flex;
+  /* Added */
+  justify-content: space-between;
+  /* Added */
   width: 100%;
   padding-right: 30px;
 }
@@ -84,9 +69,12 @@ body {
 }
 
 .rideText {
-  margin-left: 10px; /* Adjust as needed */
-  display: flex; /* Added */
-  justify-content: space-between; /* Added */
+  margin-left: 10px;
+  /* Adjust as needed */
+  display: flex;
+  /* Added */
+  justify-content: space-between;
+  /* Added */
   padding-right: 30px;
 }
 
